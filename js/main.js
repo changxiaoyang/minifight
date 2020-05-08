@@ -10,6 +10,11 @@ let imageBox = new ImageBox()
 let dataBus = new DataBus()
 let ctx = canvas.getContext('2d')
 
+let instance
+
+canvas.width = wx.getSystemInfoSync().windowWidth
+canvas.height = wx.getSystemInfoSync().windowHeight
+
 /**
  * 游戏主函数
  */
@@ -24,6 +29,10 @@ export default class Main {
       // this.loader.loadPlayers(ctx)
       this.gotoPage(0)
     })
+    if (instance) {
+      return instance
+    }
+    instance = this
   }
 
   /**
@@ -31,15 +40,17 @@ export default class Main {
    *    不在此处 new 
    */
   gotoPage(pageNo) {
+    this.startMenu.closeSetUp()
     switch(pageNo) {
       case 0:
         dataBus.currentPage = 0
-        this.player.stopAnimation()
+        this.player.cutOut()
+        this.selectColor.cutOut()
         this.startMenu.cutIn()
         break
       case 1:
         dataBus.currentPage = 1
-        this.player.stopAnimation()
+        this.player.cutOut()
         this.selectColor.cutIn()
         break
       case 2:
@@ -66,3 +77,13 @@ export default class Main {
   }
 
 }
+
+/**
+ * 切出屏幕回来时调用
+ */
+wx.onShow(res => {
+  if(instance.player)
+    setTimeout(function () {
+      instance.render()
+    }, 50)
+})

@@ -50,6 +50,17 @@ export default class Music {
       h: 43
     }
 
+    this.btnBg = {
+      picX: 0,
+      picY: 464,
+      picW: 280,
+      picH: 100,
+      x: screenWidth * .95 - 50,
+      y: 100,
+      w: screenWidth * .05 + 105,
+      h: 42
+    }
+
     this.closeMusic()
     // this.bgmAudio = new Audio()
     // this.bgmAudio.loop = true
@@ -65,6 +76,11 @@ export default class Music {
   }
 
   render(ctx) {
+    this.btnBg.x = !this.setup.playing ? screenWidth * .95 - 4 
+        :dataBus.currentPage != 0 ? screenWidth * .95 - 104 : screenWidth * .95 - 54
+    ctx.drawImage(imageBox.menuImg,
+      this.btnBg.picX, this.btnBg.picY, this.btnBg.picW, this.btnBg.picH,
+      this.btnBg.x, this.btnBg.y, this.btnBg.w, this.btnBg.h)
     ctx.drawImage(imageBox.menuImg,
       this.setup.picX, this.setup.picY, this.setup.picW, this.setup.picH,
       this.setup.x, this.setup.y, this.setup.w, this.setup.h)
@@ -77,6 +93,7 @@ export default class Music {
           this.home.picX, this.home.picY, this.home.picW, this.home.picH,
           this.home.x, this.home.y, this.home.w, this.home.h)
       }
+
     }
   }
 

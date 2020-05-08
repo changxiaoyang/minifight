@@ -28,10 +28,6 @@ export default class Player {
     this.animation = new Animation()
   }
 
-  stopAnimation() {
-    this.animation.stop()
-  }
-
   resetEnemy() {
     let org = new BluePlayer({ id: 1, img: imageBox.brownImg })
     let blue = new BluePlayer({ id: 2, img: imageBox.blueImg })
@@ -54,6 +50,11 @@ export default class Player {
 
     this.gameInfo = new GameInfo(this.player, this.ai.player)
     this.restart()
+  }
+
+  cutOut() {
+    this.animation.stop()
+    this.menu.removeAllHandler()
   }
 
   /**

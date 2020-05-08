@@ -74,6 +74,14 @@ export default class SelectColor{
     }
   }
 
+  /**
+   * 切出页面，移除Handler
+   */
+  cutOut() {
+    canvas.removeEventListener('touchend', this.stEndHanler)
+    canvas.removeEventListener('touchstart', this.selectHandler)
+  }
+
   addSelectHandler() {
     this.selectHandler = this.selectTouchHander.bind(this)
     canvas.addEventListener('touchstart', this.selectHandler)

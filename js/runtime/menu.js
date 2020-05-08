@@ -163,6 +163,13 @@ export default class Menu {
     canvas.addEventListener('touchstart', this.attTouchHandler)
   }
 
+  removeAllHandler() {
+    canvas.removeEventListener('touchstart', this.touchHandler)
+    canvas.removeEventListener('touchstart', this.attTouchHandler)
+    canvas.removeEventListener('touchmove', this.moveHandler)
+    canvas.removeEventListener('touchend', this.endHandler)
+  } 
+
   attTouchHandler(e) {
     e.preventDefault()
     let x = e.changedTouches[0].clientX

@@ -177,4 +177,7 @@ export default class StartMenu {
     }
   }
 
+  closeSetUp() {
+    music.setup.playing = false
+  }
 }

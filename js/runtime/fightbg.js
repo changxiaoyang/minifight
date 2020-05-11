@@ -31,7 +31,7 @@ export default class FightBg {
   render(ctx) {
     ctx.drawImage(
       imageBox.fbgImg,
-      this.bgPoint.x[this.level], this.bgPoint.y[this.level], 400, 200,
+      this.bgPoint.x[this.level], this.bgPoint.y[this.level], 400, 198,
       0, 0, screenWidth, screenHeight
     )
   }

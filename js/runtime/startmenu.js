@@ -66,7 +66,7 @@ export default class StartMenu {
   }
  
   render() {
-    this.ctx.drawImage(imageBox.fbgImg, 0, 0, 200, 125, 0, 0, screenWidth, screenHeight)
+    this.ctx.drawImage(imageBox.fbgImg, 0, 0, 200, 124, 0, 0, screenWidth, screenHeight)
     this.ctx.drawImage(imageBox.menuImg, 
       this.chlg.picX, this.chlg.picY, this.chlg.picW, this.chlg.picH, 
       this.chlg.x, this.chlg.y, this.btn.w, this.btn.h)
@@ -89,6 +89,7 @@ export default class StartMenu {
    */
   endTouchHander(e) {
     e.preventDefault()
+    music.playClick()
     let x = e.changedTouches[0].clientX
     let y = e.changedTouches[0].clientY
     this.resetBtn()
@@ -163,6 +164,7 @@ export default class StartMenu {
     let x = e.changedTouches[0].clientX
     let y = e.changedTouches[0].clientY
     if (music.onMenuBtn(x, y)) {
+      music.playClick()
       music.setup.playing = !music.setup.playing
       this.main.render()
     }
@@ -172,6 +174,7 @@ export default class StartMenu {
       this.main.render()
     }
     if (music.onHomeBtn(x, y)) {
+      music.playClick()
       music.closeMenu()
       this.main.gotoPage(0)
     }

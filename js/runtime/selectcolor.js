@@ -97,6 +97,7 @@ export default class SelectColor{
       case 2:
       case 3:
       case 4:
+        music.playSelect()
         this.selecter = usr
         this.changeSelect()
         break
@@ -120,6 +121,7 @@ export default class SelectColor{
    */
   endSTouchHander(e) {
     e.preventDefault()
+    music.playClick()
     let x = e.changedTouches[0].clientX
     let y = e.changedTouches[0].clientY
     this.resetStartBtn()
@@ -163,6 +165,7 @@ export default class SelectColor{
 
   render() {
     this.ctx.clearRect(0, 0, window.innerWidth, window.innerHeight)
+    this.ctx.drawImage(imageBox.fbgImg, 200, 0, 200, 124, 0, 0, screenWidth, screenHeight)
     this.ctx.drawImage(
       imageBox.menuImg,
       this.selectBg.picX, this.selectBg.picY, this.selectBg.picW, this.selectBg.picH, 

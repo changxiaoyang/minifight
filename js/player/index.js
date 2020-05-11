@@ -111,6 +111,7 @@ export default class Player {
    * 绘制图画
    */
   render() {
+    this.ctx.drawImage(imageBox.fbgImg, 200, 0, 200, 124, 0, 0, screenWidth, screenHeight)
     this.ai.render(this.ctx)
     this.player.render(this.ctx)
     this.gameInfo.render(this.ctx, this.ai.practice)

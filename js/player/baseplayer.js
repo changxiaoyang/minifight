@@ -278,7 +278,7 @@ export default class BasePlayer {
       frameH: [0, 20, 12, 4, -4, -12, -20],
       count: 7,
       isPlaying: false,
-      picIndexH: 0,
+      picIndexH: -1,
       picIndex: 434,
       dirc: 0,
       picW: 80,

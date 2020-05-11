@@ -5,15 +5,28 @@ import StartMenu from './runtime/startmenu'
 import Player from './player/index'
 import PlayerLoader from './player/playerloader'
 import SelectColor from './runtime/selectcolor'
+import Music from './runtime/music'
 
 let imageBox = new ImageBox()
 let dataBus = new DataBus()
+let music = new Music()
 let ctx = canvas.getContext('2d')
 
 let instance
 
 canvas.width = wx.getSystemInfoSync().windowWidth
 canvas.height = wx.getSystemInfoSync().windowHeight
+
+/**
+ * 切出屏幕回来时调用
+ */
+wx.onShow(res => {
+  music.playBgm()
+  if (instance.player)
+    setTimeout(function () {
+      instance.render()
+    }, 50)
+})
 
 /**
  * 游戏主函数
@@ -47,6 +60,7 @@ export default class Main {
         this.player.cutOut()
         this.selectColor.cutOut()
         this.startMenu.cutIn()
+        music.changeBgm()
         break
       case 1:
         dataBus.currentPage = 1
@@ -56,6 +70,7 @@ export default class Main {
       case 2:
         dataBus.currentPage = 2
         this.player.cutIn(this.startMenu.curBtnId, this.selectColor.selecter)
+        music.changeBgm()
         break
     }
   }
@@ -78,12 +93,3 @@ export default class Main {
 
 }
 
-/**
- * 切出屏幕回来时调用
- */
-wx.onShow(res => {
-  if(instance.player)
-    setTimeout(function () {
-      instance.render()
-    }, 50)
-})

@@ -61,18 +61,33 @@ export default class Music {
       h: 42
     }
 
-    this.closeMusic()
-    // this.bgmAudio = new Audio()
-    // this.bgmAudio.loop = true
-    // this.bgmAudio.src  = 'audio/bgm.mp3'
+    this.bgmAudio = new Audio()
+    this.bgmAudio.loop = true
+    this.bgmAudio.src  = 'audio/bg1.mp3'
 
     // this.shootAudio     = new Audio()
     // this.shootAudio.src = 'audio/bullet.mp3'
 
     // this.boomAudio     = new Audio()
     // this.boomAudio.src = 'audio/boom.mp3'
-
+    this.clickAudio = new Audio()
+    this.clickAudio.src = 'audio/click.mp3'
+    this.selectAudio = new Audio()
+    this.selectAudio.src = 'audio/select.mp3'
     // this.playBgm()
+
+    this.closeMusic()
+
+  }
+
+  changeBgm() {
+    this.bgmAudio.pause()
+    if (dataBus.currentPage == 2) {
+      this.bgmAudio.src = 'audio/bg1.mp3'
+    } else {
+      this.bgmAudio.src = 'audio/bg2.mp3'
+    }
+    this.playBgm()
   }
 
   render(ctx) {
@@ -103,11 +118,13 @@ export default class Music {
   closeMusic() {
     this.music.playing = false
     this.music.picY = 246
+    this.bgmAudio.pause()
   }
 
   openMusic() {
     this.music.playing = true
     this.music.picY = 102
+    this.playBgm()
   }
 
   closeMenu() {
@@ -142,7 +159,9 @@ export default class Music {
   }
 
   playBgm() {
-    this.bgmAudio.play()
+    if (this.music.playing) {
+      this.bgmAudio.play()
+    }
   }
 
   playShoot() {
@@ -150,8 +169,17 @@ export default class Music {
     this.shootAudio.play()
   }
 
-  playExplosion() {
-    this.boomAudio.currentTime = 0
-    this.boomAudio.play()
+  playClick() {
+    if (this.music.playing) {
+      this.clickAudio.currentTime = 0.25
+      this.clickAudio.play()
+    }
+  }
+
+  playSelect() {
+    if (this.music.playing) {
+      this.selectAudio.currentTime = 0
+      this.selectAudio.play()
+    }
   }
 }

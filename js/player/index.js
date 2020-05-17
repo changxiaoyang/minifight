@@ -3,10 +3,12 @@ import BrownPlayer from './brownplayer'
 import GirlPlayer from './girlplayer'
 import BluePlayer from './blueplayer'
 import Ai from './ai'
-import GameInfo from '../runtime/gameinfo.js'
+import GameInfo from '../runtime/gameinfo'
+import Score from '../runtime/score'
 import ImageBox from '../imagebox'
 import Menu from '../runtime/menu'
 import FightBg from '../runtime/fightbg'
+import Music from '../runtime/music'
 import Animation from '../base/animation'
 
 const screenWidth    = window.innerWidth
@@ -14,6 +16,8 @@ const screenHeight   = window.innerHeight
 
 let databus = new DataBus()
 let imageBox = new ImageBox()
+let score = new Score()
+let music = new Music()
 
 export default class Player {
   constructor(ctx, main) {
@@ -23,12 +27,15 @@ export default class Player {
     this.pointX = 30
     this.pointY = 30
 
+    this.level = 1
+
     this.menu = new Menu()
     this.fightBg = new FightBg()
     this.animation = new Animation()
   }
 
   resetEnemy() {
+    this.level = 1
     let org = new BluePlayer({ id: 1, img: imageBox.brownImg })
     let blue = new BluePlayer({ id: 2, img: imageBox.blueImg })
     let green = new BluePlayer({ id: 3, img: imageBox.greenImg })
@@ -45,11 +52,25 @@ export default class Player {
     if (mode === 3) {
       this.ai.practice = true
     }
-    // this.brPlayer = new BrownPlayer(this.pointX, this.pointY, usrColor)
-    this.player.enemy(this.ai.player)
+    this.player.setEnemy(this.ai.player)
 
     this.gameInfo = new GameInfo(this.player, this.ai.player)
     this.restart()
+  }
+
+  /**
+   * 下一关
+   */
+  nextLevel() {
+    setTimeout(()=> {
+      this.level++
+      this.player.initPosition(this.pointX, this.pointY)
+      this.player.initVitalSigns()
+      this.ai.nextPlayer()
+      this.player.setEnemy(this.ai.player)
+      this.gameInfo = new GameInfo(this.player, this.ai.player)
+      this.restart()
+    }, 4000)
   }
 
   cutOut() {
@@ -61,10 +82,14 @@ export default class Player {
    * 开始游戏
    */
   restart() {
+    this.ko = false
+    this.to = false
+    this.defeat = false
+    this.printScore = false
+    score.initScore()
     this.animation.play(() => {
-      this.ctx.clearRect(0, 0, screenWidth, screenHeight)
-      // this.fightBg.render(this.ctx)
       this.update(databus.frequency, this.menu.getMenuStatus(), this.menu.attStatus)
+      this.ctx.clearRect(0, 0, screenWidth, screenHeight)
       this.render()
       this.menu.render(this.ctx)
     })
@@ -76,9 +101,26 @@ export default class Player {
    * 更新状态
    */
   update(frequency, dirc, att) {
-    if (this.player.dead || this.ai.player.dead || this.timeOver()) {
-      frequency = frequency * 3
-      // this.gameInfo.renderWinner(ctx, this.brPlayer)
+    //准备阶段
+    if (score.ready > 0) {
+      score.countdown()
+      return
+    }
+    let winner = this.checkWinner(this.player, this.ai.player)
+    if (winner) {
+      let playerWin = (winner.ccerId == this.player.ccerId)
+      this.calculateScore(playerWin)
+      if (winner.victory.end == true) {
+        this.animation.stop()
+        //玩家获胜
+        if (playerWin) {
+          //计算本关得分
+          this.nextLevel()
+        } else {
+          music.playGameOver()
+        }
+        return
+      }
     }
     
     let pos = this.player.position(this.ai.player)
@@ -115,14 +157,54 @@ export default class Player {
     this.ai.render(this.ctx)
     this.player.render(this.ctx)
     this.gameInfo.render(this.ctx, this.ai.practice)
+    if (this.to) 
+      score.renderTO(this.ctx)
+    else if (this.ko)
+      score.renderKO(this.ctx)
+    if (this.printScore)
+      score.renderScore(this.ctx, databus.score)
+    if (score.ready > 0) 
+      score.renderCD(this.ctx)
+    if (this.defeat)
+      score.renderContinue(this.ctx)
   }
 
   timeOver() {
     return this.gameInfo.timer.surplus === 0
   }
 
-  renderWinner() {
-    
+  checkWinner(player, ai) {
+    if (player.dead && ai.dead)
+      return false
+    if (player.dead) {
+      return this.winner(ai)
+    }
+    if (ai.dead) {
+      return this.winner(player)
+    }
+    if (this.timeOver()) {
+      this.to = true
+      return this.winner((ai.hp > player.hp) ? ai : player)
+    }
+    return false
   }
 
+  winner(player) {
+    this.menu.removeAllHandler()
+    player.victory.isPlaying = true
+    this.ko = true
+    return player
+  }
+
+  calculateScore(playerWin) {
+    if (!playerWin) {
+      this.defeat = true
+      return
+    }
+    let timeScore = this.gameInfo.timer.count * 500
+    let hpScore = this.player.hp * 500
+    let sum = timeScore + hpScore
+    databus.score = Math.max(sum, databus.score)
+    this.printScore = true
+  }
 }

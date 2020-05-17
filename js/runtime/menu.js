@@ -168,6 +168,11 @@ export default class Menu {
     canvas.removeEventListener('touchstart', this.attTouchHandler)
     canvas.removeEventListener('touchmove', this.moveHandler)
     canvas.removeEventListener('touchend', this.endHandler)
+    this.touchId = -1
+    this.fingerPoint = {
+      x: this.menuRadius + 25,
+      y: this.menuRadius * 4 - 10
+    }
   } 
 
   attTouchHandler(e) {

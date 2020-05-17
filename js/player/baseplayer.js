@@ -28,6 +28,7 @@ export default class BasePlayer {
     this.initVitalSigns()
     this.initMemoryBuffer()
 
+    this.enemy = null
     this.initActionFrame()
     this.initPicInfo()
     this.initAbsArr()
@@ -75,7 +76,8 @@ export default class BasePlayer {
     this.acQueue = []   // 操作记忆队列
   }
 
-  enemy(other) {
+  setEnemy(other) {
+    this.enemy = null
     this.enemy = other
     other.enemy = this
   }
@@ -151,6 +153,18 @@ export default class BasePlayer {
       picH: 58,
       rX: 0,
       rY: 30,
+      curFrame: 0
+    }
+    this.victory = {
+      count: 2,
+      isPlaying: false,
+      picIndexH: 336,
+      picIndex: 250,
+      picW: 72,
+      picH: 110,
+      end: false,
+      rX: -6,
+      rY: -30,
       curFrame: 0
     }
     //防御
@@ -294,7 +308,7 @@ export default class BasePlayer {
       count: 6,
       isPlaying: false,
       picIndexH: 1028,
-      picIndex: 224,
+      picIndex: 226,
       dirc: 0,
       picW: 78,
       picH: 64,
@@ -337,6 +351,7 @@ export default class BasePlayer {
    * 更新状态
    */
   update(frequency, dirc, att, pos) {
+    
     if (this.footwall.isPlaying) {
       this.updateBeinjured(frequency)
       return
@@ -366,13 +381,16 @@ export default class BasePlayer {
     switch (att) {
       case 1:
         this.clearQueue()
+        this.resetMoveFrame() 
         this.updateAzure(frequency)
         break
       case 2:
         this.clearQueue()
+        this.resetMoveFrame() 
         this.updateOrange(frequency)
         break
       case 3:
+        this.resetMoveFrame()        
         this.clearQueue()
         this.updateBlue(frequency)
         break
@@ -396,6 +414,10 @@ export default class BasePlayer {
     if (this.rolling.isPlaying) {
       this.clearQueue()
       this.updateRolling(frequency, this.rolling.dirc)
+      return
+    }
+    if (this.victory.isPlaying) {
+      this.updateVictory(frequency)
       return
     }
     switch (dirc) {
@@ -454,6 +476,24 @@ export default class BasePlayer {
   }
 
   /**
+   * 胜利动画
+   */
+  updateVictory(frequency) {
+    let frc = frequency
+    this.initActionPic(this.victory)
+    let cor = Math.floor(this.victory.curFrame / frc)
+    let frm = cor
+    if (cor > 3) {
+      cor = this.victory.count - cor - 1
+    }
+    this.pic.x = INITIAL_X + this.pic.pos * this.victory.picIndex + this.pic.pos * this.pic.width * cor
+    this.victory.curFrame++
+    if (this.victory.curFrame === this.victory.count * frc - 1) {
+      this.victory.end = true
+    }
+  }
+
+  /**
    * 下蹲
    */
   updateSquat(frequency, def) {
@@ -487,7 +527,7 @@ export default class BasePlayer {
     }
     this.pic.x = INITIAL_X + this.pic.pos * this.pic.width * cor
     this.jump.curFrame++
-    if (this.jump.curFrame === this.jump.count * frc) {
+    if (this.jump.curFrame === this.jump.count * frc - 1) {
       this.jump.curFrame = 0
       this.jump.isPlaying = false
     }
@@ -513,7 +553,7 @@ export default class BasePlayer {
         this.pointX += dirc * 4
     }
     this.rolling.curFrame++
-    if (this.rolling.curFrame === this.rolling.count * frc) {
+    if (this.rolling.curFrame === this.rolling.count * frc - 1) {
       this.rolling.curFrame = 0
       this.rolling.isPlaying = false
     }
@@ -558,8 +598,8 @@ export default class BasePlayer {
       }
     }
     this.run.curFrame++
-    if (this.run.curFrame === this.run.count * frc
-      || this.run.curFrame === -this.run.count * frc) {
+    if (this.run.curFrame === this.run.count * frc - 1
+      || this.run.curFrame === -this.run.count * frc - 1) {
       this.run.curFrame = 0
     }
   }
@@ -608,8 +648,8 @@ export default class BasePlayer {
 
     this.leftOrRight.curFrame++
     //动画完成
-    if (this.leftOrRight.curFrame === this.leftOrRight.count * frc
-      || this.leftOrRight.curFrame === -this.leftOrRight.count * frc) {
+    if (this.leftOrRight.curFrame === this.leftOrRight.count * frc - 1
+      || this.leftOrRight.curFrame === -this.leftOrRight.count * frc - 1) {
       this.leftOrRight.curFrame = 0
     }
   }
@@ -642,6 +682,13 @@ export default class BasePlayer {
         this.pointX -= this.pic.pos
       }
     }
+  }
+  
+  /**
+   * 重置移动
+   */
+  resetMoveFrame() {
+    this.leftOrRight.curFrame = 0
   }
 
   /**
@@ -697,7 +744,7 @@ export default class BasePlayer {
 
     this.blue.curFrame++
     //动画完成
-    if (this.blue.curFrame === this.blue.count * frc) {
+    if (this.blue.curFrame === this.blue.count * frc - 1) {
       this.blue.isPlaying = false
       this.blue.curFrame = 0
       this.absAttPxArr = []
@@ -721,7 +768,7 @@ export default class BasePlayer {
     this.pic.x = INITIAL_X + this.pic.pos * this.jOrg.picIndex
     this.jOrg.curFrame++
     //动画完成
-    if (this.jOrg.curFrame === this.jOrg.count * frc) {
+    if (this.jOrg.curFrame === this.jOrg.count * frc - 1) {
       this.jOrg.isPlaying = false
       this.jOrg.curFrame = 0
       this.orange.isPlaying = false
@@ -777,7 +824,7 @@ export default class BasePlayer {
     }
     this.orange.curFrame++
     //动画完成
-    if (this.orange.curFrame === this.orange.count * frc) {
+    if (this.orange.curFrame === this.orange.count * frc - 1) {
       this.orange.isPlaying = false
       this.orange.curFrame = 0
       this.absAttPxArr = []
@@ -808,7 +855,7 @@ export default class BasePlayer {
     }
     this.sOrg.curFrame++
     //动画完成
-    if (this.sOrg.curFrame === this.sOrg.count * frc) {
+    if (this.sOrg.curFrame === this.sOrg.count * frc - 1) {
       this.sOrg.isPlaying = false
       this.sOrg.curFrame = 0
       this.orange.isPlaying = false
@@ -820,6 +867,7 @@ export default class BasePlayer {
    * 被打
    */
   updateUnderAtt(power, frc) {
+    this.resetAttStatus()
     if (this.hp > power) {
       this.hp -= power
       if (power > 5) {
@@ -908,6 +956,38 @@ export default class BasePlayer {
       this.fallUp.isPlaying = true
       this.footwall.pos = 0
     }
+  }
+
+  /**
+   * 重置攻击
+   */
+  resetAttStatus() {
+    this.blue.isPlaying = false
+    this.azure.isPlaying = false
+    this.orange.isPlaying = false
+
+    this.jBlue.isPlaying = false
+    this.jAzu.isPlaying = false
+    this.jOrg.isPlaying = false
+
+    this.sAzu.isPlaying = false
+    this.sLeg.isPlaying = false
+    this.sOrg.isPlaying = false
+
+    this.slide.isPlaying = false
+
+    this.blue.curFrame = 0
+    this.azure.curFrame = 0
+    this.orange.curFrame = 0
+
+    this.jBlue.curFrame = 0
+    this.jAzu.curFrame = 0
+    this.jOrg.curFrame = 0
+
+    this.sAzu.curFrame = 0
+    this.sLeg.curFrame = 0
+    this.sOrg.curFrame = 0
+    this.slide.curFrame = 0
   }
 
   /**
@@ -1265,11 +1345,7 @@ export default class BasePlayer {
    * 绘制图画
    */
   render(ctx) {
-    let x
-    if (this.pic.pos < 0)
-      x = this.pic.x - this.pic.width
-    else
-      x = this.pic.x
+    let x = (this.pic.pos < 0) ? (this.pic.x - this.pic.width) : this.pic.x
     ctx.drawImage(
       this.ccer,
       x, this.pic.y, this.pic.width, this.pic.height,

@@ -27,12 +27,18 @@ export default class Ai {
      */
     this.practice = false
 
+    this.nextPlayer()
+  }
+
+  nextPlayer() {
     this.player = this.aiArr.shift()
     this.player.initPosition(this.pointX, this.pointY)
-    this.dirc = 1
+    this.player.pic.pos = -1
+    this.dirc = -1
     this.oprQueue = []
     this.attQueue = []
   }
+
 
   /**
    * 计算

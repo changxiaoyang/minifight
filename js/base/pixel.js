@@ -16,7 +16,7 @@ export default class Pixel {
     this.value = Math.floor(screenWidth / 12 * 10 / this.mapWidth) 
 
     this.p0 = {
-      x: screenWidth / 8,
+      x: Math.floor(screenWidth / 12) * 1.2,
       y: screenHeight * .8,
       pointX: 0,
       pointY: 79

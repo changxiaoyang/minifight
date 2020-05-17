@@ -20,6 +20,7 @@ export default class DataBus {
 
   reset() {
     this.frame      = 0
+    // 计算格斗得分
     this.score      = 0
     this.gameOver   = false
 

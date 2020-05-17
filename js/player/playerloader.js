@@ -50,6 +50,71 @@ export default class PlayerLoader {
     console.log(arr)
   }
 
+  reloadPlayer() {
+    this.resetArr(playerPxBox.orange.stand, -4)
+    this.resetArr(playerPxBox.orange.move, -4)
+    this.resetArr(playerPxBox.orange.run[0], -4)
+    this.resetArr(playerPxBox.orange.run[1], -4)
+    this.resetArr(playerPxBox.orange.run[2], -4)
+    this.resetArr(playerPxBox.orange.squat[0], -4)
+    this.resetArr(playerPxBox.orange.squat[1], -4)
+    this.resetArr(playerPxBox.orange.jump[0], -4)
+    this.resetArr(playerPxBox.orange.jump[1], -4)
+    this.resetArr(playerPxBox.orange.jump[2], -4)
+    this.resetArr(playerPxBox.orange.jump[3], -4)
+    this.resetArr(playerPxBox.orange.rolling[0], -4)
+    this.resetArr(playerPxBox.orange.rolling[1], -4)
+    this.resetArr(playerPxBox.orange.rolling[2], -4)
+    this.resetArr(playerPxBox.orange.rolling[3], -4)
+    this.resetArr(playerPxBox.orange.azure[0], -4)
+    this.resetArr(playerPxBox.orange.azure[1], -4)
+    this.resetArr(playerPxBox.orange.blue[0], -4)
+    this.resetArr(playerPxBox.orange.blue[1], -4)
+    this.resetArr(playerPxBox.orange.orange[0], -4)
+    this.resetArr(playerPxBox.orange.orange[1], -4)
+    this.resetArr(playerPxBox.orange.orange[2], -4)
+    this.resetArr(playerPxBox.orange.orange[3], -4)
+    this.resetArr(playerPxBox.orange.orange[4], -4)
+    this.resetArr(playerPxBox.orange.slide[0], -4)
+    this.resetArr(playerPxBox.orange.sLeg[0], -4)
+    this.resetArr(playerPxBox.orange.sLeg[1], -4)
+    this.resetArr(playerPxBox.orange.sLeg[2], -4)
+    this.resetArr(playerPxBox.orange.sAzu[0], -4)
+    this.resetArr(playerPxBox.orange.sAzu[1], -4)
+    this.resetArr(playerPxBox.orange.sAzu[2], -4)
+    this.resetArr(playerPxBox.orange.sOrg[0], -4)
+    this.resetArr(playerPxBox.orange.sOrg[1], -4)
+    this.resetArr(playerPxBox.orange.sOrg[2], -4)
+    this.resetArr(playerPxBox.orange.jBlue[0], -4)
+    this.resetArr(playerPxBox.orange.jBlue[1], -4)
+    this.resetArr(playerPxBox.orange.jAzu[0], -4)
+    this.resetArr(playerPxBox.orange.jAzu[1], -4)
+    this.resetArr(playerPxBox.orange.jOrg[0], -4)
+
+    this.resetArr(playerPxBox.orangeAtt.azure[1], -4)
+    this.resetArr(playerPxBox.orangeAtt.blue[0], -4)
+    this.resetArr(playerPxBox.orangeAtt.blue[1], -4)
+    this.resetArr(playerPxBox.orangeAtt.orange[1], -4)
+    this.resetArr(playerPxBox.orangeAtt.orange[2], -4)
+    this.resetArr(playerPxBox.orangeAtt.orange[3], -4)
+    this.resetArr(playerPxBox.orangeAtt.slide[0], -4)
+    this.resetArr(playerPxBox.orangeAtt.sLeg[1], -4)
+    this.resetArr(playerPxBox.orangeAtt.sLeg[2], -4)
+    this.resetArr(playerPxBox.orangeAtt.sAzu[2], -4)
+    this.resetArr(playerPxBox.orangeAtt.sOrg[1], -4)
+    this.resetArr(playerPxBox.orangeAtt.sOrg[2], -4)
+    this.resetArr(playerPxBox.orangeAtt.jAzu[1], -4)
+    this.resetArr(playerPxBox.orangeAtt.jBlue[1], -4)
+    this.resetArr(playerPxBox.orangeAtt.jOrg[0], -4)
+  }
+
+  resetArr(arr, num) {
+    for (let i = 0; i< arr.length; i++) {
+      let po = arr[i].split(',')
+      arr[i] = (parseInt(po[0]) + num) + ',' + po[1]
+    }
+  }
+
   /**
    * 执行所有的加载过程
    */

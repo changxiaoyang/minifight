@@ -74,9 +74,12 @@ export default class Music {
     this.clickAudio.src = 'audio/click.mp3'
     this.selectAudio = new Audio()
     this.selectAudio.src = 'audio/select.mp3'
+
+    this.gameOverAudio = new Audio()
+    this.gameOverAudio.src = 'audio/gameover.mp3'
     // this.playBgm()
 
-    this.closeMusic()
+    this.openMusic()
 
   }
 
@@ -180,6 +183,14 @@ export default class Music {
     if (this.music.playing) {
       this.selectAudio.currentTime = 0
       this.selectAudio.play()
+    }
+  }
+
+  playGameOver() {
+    this.bgmAudio.pause()
+    if (this.music.playing) {
+      this.gameOverAudio.currentTime = 0
+      this.gameOverAudio.play()
     }
   }
 }

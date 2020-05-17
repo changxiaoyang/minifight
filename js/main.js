@@ -38,8 +38,8 @@ export default class Main {
       this.startMenu = new StartMenu(ctx, this)
       this.player = new Player(ctx, this)
      
-      // this.loader = new PlayerLoader()
-      // this.loader.loadPlayers(ctx)
+      this.loader = new PlayerLoader()
+      this.loader.reloadPlayer()
       this.gotoPage(0)
     })
     if (instance) {

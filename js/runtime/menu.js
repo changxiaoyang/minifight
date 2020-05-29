@@ -163,6 +163,30 @@ export default class Menu {
     canvas.addEventListener('touchstart', this.attTouchHandler)
   }
 
+
+  addContinueHandler() {
+    this.continueHandler = this.ctnTouchHander.bind(this)
+    canvas.addEventListener('touchstart', this.continueHandler)
+  }
+
+  removeContinueHandler() {
+    canvas.removeEventListener('touchstart', this.continueHandler)
+  }
+
+  ctnTouchHander(e) {
+    e.preventDefault()
+    let x = e.changedTouches[0].clientX
+    let y = e.changedTouches[0].clientY
+    if (this.inContinue(x, y)) {
+
+    }
+  }
+
+  inContinue(x, y) {
+    return x > this.ctn.x && x < this.ctn.x + this.ctn.w
+      && y > this.ctn.y && y < this.ctn.y + this.ctn.h
+  }
+
   removeAllHandler() {
     canvas.removeEventListener('touchstart', this.touchHandler)
     canvas.removeEventListener('touchstart', this.attTouchHandler)

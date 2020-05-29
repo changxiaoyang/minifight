@@ -65,11 +65,6 @@ export default class Music {
     this.bgmAudio.loop = true
     this.bgmAudio.src  = 'audio/bg1.mp3'
 
-    // this.shootAudio     = new Audio()
-    // this.shootAudio.src = 'audio/bullet.mp3'
-
-    // this.boomAudio     = new Audio()
-    // this.boomAudio.src = 'audio/boom.mp3'
     this.clickAudio = new Audio()
     this.clickAudio.src = 'audio/click.mp3'
     this.selectAudio = new Audio()
@@ -77,18 +72,25 @@ export default class Music {
 
     this.gameOverAudio = new Audio()
     this.gameOverAudio.src = 'audio/gameover.mp3'
-    // this.playBgm()
+    this.koAudio = new Audio()
+    this.koAudio.src = 'audio/ko.mp3'
+    this.dingAudio = new Audio()
+    this.dingAudio.src = 'audio/d3.mp3'
 
-    this.openMusic()
-
+    if (wx.getStorageSync('music'))
+      this.openMusic()
+    else
+      this.closeMusic()
   }
 
   changeBgm() {
     this.bgmAudio.pause()
     if (dataBus.currentPage == 2) {
-      this.bgmAudio.src = 'audio/bg1.mp3'
-    } else {
+      this.bgmAudio.src = 'audio/bg3.mp3'
+    } else if (dataBus.currentPage == 0) {
       this.bgmAudio.src = 'audio/bg2.mp3'
+    } else {
+      this.bgmAudio.src = 'audio/bg1.mp3'
     }
     this.playBgm()
   }
@@ -122,12 +124,14 @@ export default class Music {
     this.music.playing = false
     this.music.picY = 246
     this.bgmAudio.pause()
+    wx.setStorageSync('music', false)
   }
 
   openMusic() {
     this.music.playing = true
     this.music.picY = 102
     this.playBgm()
+    wx.setStorageSync('music', true)
   }
 
   closeMenu() {
@@ -167,15 +171,21 @@ export default class Music {
     }
   }
 
-  playShoot() {
-    this.shootAudio.currentTime = 0
-    this.shootAudio.play()
+  stopBgm() {
+    this.bgmAudio.pause()
   }
 
   playClick() {
     if (this.music.playing) {
       this.clickAudio.currentTime = 0.25
       this.clickAudio.play()
+    }
+  }
+
+  playDing() {
+    if (this.music.playing) {
+      this.dingAudio.currentTime = 0
+      this.dingAudio.play()
     }
   }
 
@@ -191,6 +201,13 @@ export default class Music {
     if (this.music.playing) {
       this.gameOverAudio.currentTime = 0
       this.gameOverAudio.play()
+    }
+  }
+
+  playKO() {
+    if (this.music.playing) {
+      this.koAudio.currentTime = 0
+      this.koAudio.play()
     }
   }
 }

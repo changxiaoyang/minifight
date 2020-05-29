@@ -65,6 +65,7 @@ export default class BasePlayer {
   initAbsArr() {
     this.absPxArr = this.toAbsArr(playerPxBox.orange.stand, this.pointX, this.pointY)
     this.absAttPxArr = []
+    this.absTecPxArr = []
   }
 
   /**
@@ -351,7 +352,7 @@ export default class BasePlayer {
    * 更新状态
    */
   update(frequency, dirc, att, pos) {
-    
+    this.updateTech(playerPxBox.orangeAtt.tecAzu)
     if (this.footwall.isPlaying) {
       this.updateBeinjured(frequency)
       return
@@ -380,19 +381,19 @@ export default class BasePlayer {
     }
     switch (att) {
       case 1:
-        this.clearQueue()
         this.resetMoveFrame() 
         this.updateAzure(frequency)
+        this.clearQueue()
         break
       case 2:
-        this.clearQueue()
         this.resetMoveFrame() 
         this.updateOrange(frequency)
+        this.clearQueue()
         break
       case 3:
         this.resetMoveFrame()        
-        this.clearQueue()
         this.updateBlue(frequency)
+        this.clearQueue()
         break
       default:
         this.pic.pos = pos
@@ -1165,13 +1166,18 @@ export default class BasePlayer {
     }
   }
 
-
   /**
    * 第一个按钮 出拳
    */
   updateAzure(frequency) {
     let frc = frequency
     this.azure.isPlaying = true
+    if (this.kt01.isPlaying || 
+      (this.ccerId == 1 && this.lastAction([7, 8, 1]) && this.pic.pos > 0 ) ||
+      (this.ccerId == 1 && this.lastAction([7, 6, 5]) && this.pic.pos < 0)) {
+      this.killTechniques01(frequency)
+      return
+    }
     if (this.squat.isPlaying || this.sAzu.isPlaying) {
       this.updateSAzu(frequency)
       return
@@ -1288,8 +1294,12 @@ export default class BasePlayer {
     let a2 = 0
     if (this.intersect(this.absAttPxArr, this.enemy.absPxArr).length > 0)
       a1 = this.damage
+    else if (this.intersect(this.absTecPxArr, this.enemy.absPxArr).length > 0)
+      a1 = 10
     if (this.intersect(this.absPxArr, this.enemy.absAttPxArr).length > 0)
       a2 = this.enemy.damage
+    else if (this.intersect(this.absPxArr, this.enemy.absTecPxArr).length > 0)
+      a2 = 10
     return [a1, a2]
   }
 
@@ -1354,6 +1364,16 @@ export default class BasePlayer {
       pixel.p0.y - this.pointY * pixel.value + this.pic.renderY,
       this.pic.width * 1.2, this.pic.height * 1.2
     )
+
+    this.techArr.forEach((tech) => {
+      ctx.drawImage(
+        imageBox.jnImg,
+        tech.picX - tech.picW/2, tech.picY, tech.picW, tech.picH,
+        (this.pointX + tech.len) * pixel.value + pixel.p0.x - tech.picW * .3,
+        pixel.p0.y - this.pointY * pixel.value,
+        tech.picW * .6, tech.picH * .6
+      )
+    })
   }
 
   /**

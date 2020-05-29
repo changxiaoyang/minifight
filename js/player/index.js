@@ -20,14 +20,12 @@ let score = new Score()
 let music = new Music()
 
 export default class Player {
-  constructor(ctx, main) {
+  constructor(ctx) {
     this.ctx = ctx
-    this.main = main
     // 玩家像素化的位置
-    this.pointX = 30
+    this.pointX = 60
     this.pointY = 30
-
-    this.level = 1
+    this.outerX = 220
 
     this.menu = new Menu()
     this.fightBg = new FightBg()
@@ -36,6 +34,9 @@ export default class Player {
 
   resetEnemy() {
     this.level = 1
+    this.round = 1
+    this.roundEnd = false
+    this.levelEnd = false
     let org = new BluePlayer({ id: 1, img: imageBox.brownImg })
     let blue = new BluePlayer({ id: 2, img: imageBox.blueImg })
     let green = new BluePlayer({ id: 3, img: imageBox.greenImg })
@@ -48,14 +49,34 @@ export default class Player {
     this.player = this.ememies[color - 1]
     this.player.initPosition(this.pointX, this.pointY)
     this.ememies.splice(color - 1, 1)
-    this.ai = new Ai(this.ememies)
+    this.ai = new Ai(this.ememies, this.outerX)
     if (mode === 3) {
       this.ai.practice = true
     }
     this.player.setEnemy(this.ai.player)
-
+    
     this.gameInfo = new GameInfo(this.player, this.ai.player)
-    this.restart()
+    this.admission()
+  }
+
+  /**
+   * AI入场动画 过关时播放
+   */
+  admission() {
+    databus.gameOver = false
+    this.animation.play(() => {
+      this.defeat = 0
+      this.win = 0
+      this.round = 0
+      this.player.update(databus.frequency, 0, 0, 1)
+      let end = this.ai.admission()
+      this.ctx.clearRect(0, 0, screenWidth, screenHeight)
+      this.render()
+      if (end) {
+        this.animation.stop()
+        this.restart()
+      }
+    })
   }
 
   /**
@@ -66,7 +87,23 @@ export default class Player {
       this.level++
       this.player.initPosition(this.pointX, this.pointY)
       this.player.initVitalSigns()
+      this.ai.pointX = this.outerX
       this.ai.nextPlayer()
+      this.player.setEnemy(this.ai.player)
+      this.gameInfo = new GameInfo(this.player, this.ai.player)
+      this.admission()
+    }, 4000)
+  }
+
+  /**
+   * 下回合
+   */
+  nextRound() {
+    setTimeout(() => {
+      this.round++
+      this.player.initPosition(this.pointX, this.pointY)
+      this.player.initVitalSigns()
+      this.ai.resetPlayer()
       this.player.setEnemy(this.ai.player)
       this.gameInfo = new GameInfo(this.player, this.ai.player)
       this.restart()
@@ -84,7 +121,6 @@ export default class Player {
   restart() {
     this.ko = false
     this.to = false
-    this.defeat = false
     this.printScore = false
     score.initScore()
     this.animation.play(() => {
@@ -102,23 +138,22 @@ export default class Player {
    */
   update(frequency, dirc, att) {
     //准备阶段
-    if (score.ready > 0) {
-      score.countdown()
-      return
-    }
+    if (this.preparatory(frequency))  return
     let winner = this.checkWinner(this.player, this.ai.player)
     if (winner) {
       let playerWin = (winner.ccerId == this.player.ccerId)
       this.calculateScore(playerWin)
       if (winner.victory.end == true) {
+        if (this.ko)
+          music.playKO()
         this.animation.stop()
-        //玩家获胜
-        if (playerWin) {
-          //计算本关得分
+        this.plusWinner(playerWin)
+        if (this.defeat == 2) 
+          this.gameOver()
+        else if (this.win == 2)
           this.nextLevel()
-        } else {
-          music.playGameOver()
-        }
+        else
+          this.nextRound()
         return
       }
     }
@@ -149,6 +184,28 @@ export default class Player {
     }
   }
 
+  plusWinner(winner) {
+    if (winner) this.win ++
+    else this.defeat ++
+  }
+
+  /**
+   * 准备中，播放倒计时
+   */
+  preparatory(frequency) {
+    if (score.ready >= 0) {
+      music.stopBgm()
+      score.countdown()
+      if (score.ready < 0) {
+        music.playBgm()
+      }
+      this.ai.player.update(frequency, 0, 0, -1)
+      this.player.update(frequency, 0, 0, 1)
+      return true
+    }
+    return false
+  }
+
   /**
    * 绘制图画
    */
@@ -164,13 +221,27 @@ export default class Player {
     if (this.printScore)
       score.renderScore(this.ctx, databus.score)
     if (score.ready > 0) 
-      score.renderCD(this.ctx)
-    if (this.defeat)
+      score.renderCD(this.ctx, this.round + 1)
+    if (databus.gameOver) {
       score.renderContinue(this.ctx)
+    }
   }
 
   timeOver() {
     return this.gameInfo.timer.surplus === 0
+  }
+
+  /**
+   * 游戏失败
+   */
+  gameOver() {
+    music.playGameOver()
+    databus.gameOver = true
+    this.menu.addContinueHandler()
+    setTimeout(() => {
+      this.menu.removeContinueHandler()
+      databus.main.gotoPage(0)
+    }, 5000)
   }
 
   checkWinner(player, ai) {
@@ -196,9 +267,11 @@ export default class Player {
     return player
   }
 
+  /**
+   * 计算单场得分
+   */
   calculateScore(playerWin) {
     if (!playerWin) {
-      this.defeat = true
       return
     }
     let timeScore = this.gameInfo.timer.count * 500

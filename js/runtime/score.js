@@ -1,11 +1,13 @@
 import ImageBox from '../imagebox'
 import DataBus from '../databus'
+import Music from './music'
 
 const screenWidth = window.innerWidth
 const screenHeight = window.innerHeight
 
 let databus = new DataBus()
 let imageBox = new ImageBox()
+let music = new Music()
 
 let instance
 
@@ -42,10 +44,10 @@ export default class Score {
       picY: 678,
       picW: 178,
       picH: 60,
-      x: screenWidth * 0.3,
+      x: screenWidth * 0.35,
       y: screenHeight * 0.7,
-      w: 178,
-      h: 60
+      w: 160,
+      h: 56
     }
 
     this.initScore()
@@ -53,7 +55,9 @@ export default class Score {
 
   initScore() {
     this.frame = 179
-    this.ready = 3
+    this.ready = 4
+    this.v1 = 0
+    this.v2 = 0
   }
 
   update() {
@@ -97,25 +101,26 @@ export default class Score {
   /**
    * Countdown
    */
-  renderCD(ctx) {
+  renderCD(ctx, round) {
     ctx.font = "normal 100px Verdana";
     ctx.fillStyle = '#ff8900';
-    ctx.fillText(this.ready, screenWidth * 0.46, this.ko.y + this.ko.h);
+    if(this.ready == 4) {
+      ctx.font = "normal 56px Verdana";
+      ctx.fillStyle = '#FFFFFF';
+      ctx.fillText('Round ' + round, screenWidth * 0.38, this.ko.y + this.ko.h)
+    }
+    else
+      ctx.fillText(this.ready, screenWidth * 0.46, this.ko.y + this.ko.h)
   }
 
   countdown() {
-    if ((this.frame --) % 60 === 0)
-      this.ready --
+    if ((this.frame --) % 60 === 0) {
+      this.ready--
+      if (this.ready > 0)
+        music.playDing()
+    }
   }
 
-  addContinueHandler() {
-    this.continueHandler = this.ctnTouchHander.bind(this)
-    canvas.addEventListener('touchstart', this.continueHandler)
-  }
-
-  ctnTouchHander(e) {
-
-  }
 
 }
 

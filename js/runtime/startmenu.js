@@ -1,20 +1,21 @@
 import ImageBox from '../imagebox'
 import Music from './music'
+import DataBus from '../databus'
 
 const screenWidth = window.innerWidth
 const screenHeight = window.innerHeight
 
 let imageBox = new ImageBox()
 let music = new Music()
+let dataBus = new DataBus()
 
 /**
  * 开始界面
  */
 export default class StartMenu {
-  constructor(ctx, main) {
+  constructor(ctx) {
     this.ctx = ctx
 
-    this.main = main
     this.btn = {
       w: 160,
       h: 60
@@ -66,6 +67,7 @@ export default class StartMenu {
   }
  
   render() {
+    this.ctx.clearRect(0, 0, window.innerWidth, window.innerHeight)
     this.ctx.drawImage(imageBox.fbgImg, 0, 0, 200, 124, 0, 0, screenWidth, screenHeight)
     this.ctx.drawImage(imageBox.menuImg, 
       this.chlg.picX, this.chlg.picY, this.chlg.picW, this.chlg.picH, 
@@ -97,11 +99,11 @@ export default class StartMenu {
     canvas.removeEventListener('touchend', this.touchEndHanler)
     let endBtnId = this.inTouchArea(x, y)
     if (this.curBtnId === 1 && endBtnId === 1) {
-      this.main.gotoPage(1)
+      dataBus.main.gotoPage(1)
     } else if (this.curBtnId === 2 && endBtnId === 2) {
       this.addTouchHandler()
     } else if (this.curBtnId === 3 && endBtnId === 3) {
-      this.main.gotoPage(1)
+      dataBus.main.gotoPage(1)
     } else {
       this.addTouchHandler()
     }
@@ -166,17 +168,17 @@ export default class StartMenu {
     if (music.onMenuBtn(x, y)) {
       music.playClick()
       music.setup.playing = !music.setup.playing
-      this.main.render()
+      dataBus.main.render()
     }
     if (music.onMusicBtn(x, y)) {
       music.music.playing ? music.closeMusic() : music.openMusic()
       music.closeMenu()
-      this.main.render()
+      dataBus.main.render()
     }
     if (music.onHomeBtn(x, y)) {
       music.playClick()
       music.closeMenu()
-      this.main.gotoPage(0)
+      dataBus.main.gotoPage(0)
     }
   }
 

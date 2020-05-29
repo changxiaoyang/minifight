@@ -15,10 +15,10 @@ let TO_LEFT = [1, 2, 3, 8, 0]
 let TO_RIGHT = [0, 4, 5, 6, 7]
 
 export default class Ai {
-  constructor(imgArr) {
+  constructor(imgArr, x = 140) {
     this.aiArr = imgArr
     // AI 像素化的位置
-    this.pointX = 140
+    this.pointX = x
     this.pointY = 30
     /**
      * 练习模式 ai
@@ -27,18 +27,27 @@ export default class Ai {
      */
     this.practice = false
 
+    if (screenWidth < 800) {
+      this.defaultPositionX = 180
+    } else {
+      this.defaultPositionX = 160
+    }
     this.nextPlayer()
   }
 
   nextPlayer() {
     this.player = this.aiArr.shift()
+    this.resetPlayer()
+  }
+
+  resetPlayer() {
     this.player.initPosition(this.pointX, this.pointY)
+    this.player.initVitalSigns()
     this.player.pic.pos = -1
     this.dirc = -1
     this.oprQueue = []
     this.attQueue = []
   }
-
 
   /**
    * 计算
@@ -97,6 +106,24 @@ export default class Ai {
     this.caculate(pos)
     this.dirc = this.oprQueue.shift()
     this.player.update(f, this.dirc, this.attQueue.shift(), pos)
+  }
+
+  /**
+   * 入场动画
+   */
+  admission() {
+    if (this.player.run.isPlaying) {
+      this.player.update(databus.frequency, 1, 0, -1)
+      this.pointX = this.player.pointX
+    } else { // 跑步入场
+      this.player.update(databus.frequency, 1, 0, -1)
+      this.player.update(databus.frequency, 0, 0, -1)
+      this.player.update(databus.frequency, 1, 0, -1)
+    }
+    if (this.pointX <= this.defaultPositionX) {
+      this.player.update(databus.frequency, 0, 0, -1)
+    }
+    return this.pointX <= this.defaultPositionX
   }
 
   render(ctx) {

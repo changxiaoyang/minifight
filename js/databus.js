@@ -29,4 +29,8 @@ export default class DataBus {
     this.currentPage = 0
   }
 
+  loadMain(main) {
+    this.main = main
+  }
+
 }

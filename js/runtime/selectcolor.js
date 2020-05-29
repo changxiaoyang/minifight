@@ -1,6 +1,8 @@
 import ImageBox from '../imagebox'
 import Music from './music'
 import DataBus from '../databus'
+import Animation from '../base/animation'
+import BluePlayer from '../player/blueplayer'
 
 let imageBox = new ImageBox()
 let music = new Music()
@@ -11,10 +13,11 @@ const screenHeight = window.innerHeight
 
 export default class SelectColor{
 
-  constructor(ctx, main) {
+  constructor(ctx) {
     this.ctx = ctx
-    this.main = main
     this.selecter = 1
+    this.animation = new Animation()
+    this.initExample()
     this.setSelectBg(this.selecter)
     this.initPicPos()
   }
@@ -23,8 +26,11 @@ export default class SelectColor{
    * 切入 选择格斗颜色页面
    */
   cutIn() {
-    this.render()
     this.addSelectHandler()
+    this.animation.play(() =>{
+      this.updateExample()
+      this.render()
+    })
   }
 
   initPicPos() {
@@ -78,6 +84,7 @@ export default class SelectColor{
    * 切出页面，移除Handler
    */
   cutOut() {
+    this.animation.stop()
     canvas.removeEventListener('touchend', this.stEndHanler)
     canvas.removeEventListener('touchstart', this.selectHandler)
   }
@@ -128,7 +135,8 @@ export default class SelectColor{
     this.render()
     let usr = this.onBtnStart(x, y)
     if (usr == 13) {
-      this.main.gotoPage(2)
+      this.animation.stop()
+      dataBus.main.gotoPage(2)
     } else {
       canvas.addEventListener('touchstart', this.selectHandler)
     }
@@ -140,6 +148,7 @@ export default class SelectColor{
     let lx = this.selecter > 2
     this.selectBg.x = 48 + (lx ? 100 : 0)
     this.selectBg.y = 48 + 100 * (ly - 1)
+    this.changeExample()
     this.render()
   }
 
@@ -192,7 +201,44 @@ export default class SelectColor{
       this.start.picX, this.start.picY, this.start.picW, this.start.picH, 
       this.start.x, this.start.y, this.start.w, this.start.h
     )
+    this.renderExample()
     music.render(this.ctx)
+  }
+
+  updateExample() {
+    let att = Math.floor(Math.random() * 200)
+    if (att > 196) 
+      att = att - 196
+    else
+      att = 0
+    this.example.update(dataBus.frequency, 0, att, 1)
+  }
+
+  renderExample() {
+    this.example.render(this.ctx)
+  }
+
+  changeExample() {
+    switch (this.selecter) {
+      case 1:
+        this.example = new BluePlayer({ id: 1, img: imageBox.brownImg })
+        break
+      case 2:
+        this.example = new BluePlayer({ id: 2, img: imageBox.blueImg })
+        break
+      case 3:
+        this.example = new BluePlayer({ id: 3, img: imageBox.greenImg })
+        break
+      case 4:
+        this.example = new BluePlayer({ id: 4, img: imageBox.redImg })
+        break
+    }
+    this.example.initPosition(100, 40)
+  }
+
+  initExample() {
+    this.example = new BluePlayer({ id: 1, img: imageBox.brownImg })
+    this.example.initPosition(100, 40)
   }
 
 }

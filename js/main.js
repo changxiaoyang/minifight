@@ -33,19 +33,20 @@ wx.onShow(res => {
  */
 export default class Main {
   constructor() {
-    imageBox.onLoadImg(() => {
-      this.selectColor = new SelectColor(ctx, this)
-      this.startMenu = new StartMenu(ctx, this)
-      this.player = new Player(ctx, this)
-     
-      this.loader = new PlayerLoader()
-      this.loader.reloadPlayer()
-      this.gotoPage(0)
-    })
     if (instance) {
       return instance
     }
     instance = this
+    dataBus.loadMain(instance)
+    imageBox.onLoadImg(() => {
+      this.selectColor = new SelectColor(ctx)
+      this.startMenu = new StartMenu(ctx)
+      this.player = new Player(ctx)
+
+      this.loader = new PlayerLoader()
+      this.loader.reloadPlayer()
+      this.gotoPage(0)
+    })
   }
 
   /**
@@ -60,7 +61,6 @@ export default class Main {
         this.player.cutOut()
         this.selectColor.cutOut()
         this.startMenu.cutIn()
-        music.changeBgm()
         break
       case 1:
         dataBus.currentPage = 1
@@ -70,9 +70,9 @@ export default class Main {
       case 2:
         dataBus.currentPage = 2
         this.player.cutIn(this.startMenu.curBtnId, this.selectColor.selecter)
-        music.changeBgm()
         break
     }
+    music.changeBgm()
   }
 
   render() {
